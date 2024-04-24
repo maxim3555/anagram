@@ -2,9 +2,9 @@ import random
 import time
 
 import openpyxl
-import pyautogui
+#import pyautogui
 import requests
-from pyautogui import *
+#from pyautogui import *
 from multiprocessing import Pool
 class Vk_prosto_koment_odin:
     def __init__(self,group_id, post_id,group_full, access_token):
