@@ -2,7 +2,7 @@ import vk_api
 import random
 import openpyxl
 import requests
-from pyautogui import *
+#from pyautogui import *
 from multiprocessing import Pool
 class Vk_prosto_podpiska:
     def __init__(self,group_id, post_id,group_full, access_token):

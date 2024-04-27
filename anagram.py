@@ -6,18 +6,22 @@ import openpyxl
 
 # Указываем параметры запроса
 class Vk_prosto_anagram:
+
     def __init__(self,group_id, post_id,group_full, access_token,schet):
         self.group_id=group_id
         self.post_id=post_id
         self.group_full=group_full
         self.access_token=access_token
         self.schet=schet
+        #self.id_user=Vk_prosto_anagram.list1['G'][schet].value
 
     def spisok_s_komentov_1000(self):
-        count = 1000  # Количество комментариев, которые нужно получить
+        count = 100  # Количество комментариев, которые нужно получить
         offset = 0  # Сдвиг для получения следующей порции комментариев
         all_comments = []  # Список для хранения всех комментариев
-        while True:
+
+        while len(all_comments) < 500:  # Продолжаем цикл, пока не наберется 50 000 комментариев
+            print(len(all_comments))
             url = f'https://api.vk.com/method/wall.getComments?owner_id=-{self.group_id}&post_id={self.post_id}&v=5.131&access_token={self.access_token}&count={count}&sort=desc&offset={offset}'
             response_json = requests.get(url).json()
             comments_data = response_json['response']['items']
@@ -25,18 +29,19 @@ class Vk_prosto_anagram:
                 break  # Прекращаем цикл, если больше нет комментариев
             all_comments.extend(comments_data)  # Добавляем полученные комментарии в общий список
             offset += count  # Увеличиваем сдвиг для следующей итерации
-            if len(all_comments) >= 1000:
-                break  # Прекращаем цикл, если получили достаточно комментариев
-        comments_data = list(comment for comment in all_comments[:int(
-            input('введите колличечтво коментариев'))])  # Ограничиваем список комментариев до 1000
-        print('функция конец',len(comments_data))
-        return comments_data  # посылается полный список,если нужно 'id''text'то тут все
+
+        comments_data = all_comments[:50000]  # Ограничиваем список комментариев до 50 000
+        print('функция конец', len(comments_data))
+        return comments_data
 
     def podkoment(self):  # тут происходит поиск коментариев для игры анаграмм
         comment_id=Vk_prosto_anagram.spisok_s_komentov_1000(self)
-
+        w = 0
         podkoment_spis = []
         for i in range(len(comment_id)):
+
+            w+=1
+            print(w)
             a = comment_id[i]['id']
             response = requests.get(
                 f'https://api.vk.com/method/wall.getComments?owner_id=-{self.group_id}&post_id={self.post_id}&comment_id={a}&v=5.131&access_token={self.access_token}')
@@ -89,5 +94,47 @@ class Vk_prosto_anagram:
                 with open(other_file_path, 'a', encoding='utf-8') as new:
                     new.write(word + '\n')
                 return word  # Возвращаем слово и прекращаем выполнение
+
+    def write_to_excel(self,id):
+        book = openpyxl.open('telegramm.xlsx')
+        list1 = book.active
+        # sheet['A1'] = 'User ID'
+
+        list1[f'E{self.schet + 1}'].value = id
+
+        book.save('telegramm.xlsx')
+        book.close()
+        print("ID пользователя успешно записан в файл 'user_id.xlsx'.")
+
+    def poisk_svoih_soobsheni_komentov(self):#тут находит id коментов и записывает их в ексель
+        book = openpyxl.open('telegramm.xlsx')
+        list1 = book.active
+        url = 'https://api.vk.com/method/wall.getComments'
+        params = {
+            'access_token': self.access_token,
+            'owner_id':-144958594,
+            'post_id':29622494 ,
+            'count': 1000,
+            'extended': 1,
+            'v': '5.131'  # Добавляем параметр версии API
+        }
+
+        response = requests.get(url, params=params)
+        data = response.json()
+        data = Vk_prosto_anagram.spisok_s_komentov_1000(self)
+
+        # if 'response' in data:
+        #
+        #     comments = data['response']['items']
+
+        for comment in data:
+
+            if comment['from_id'] ==list1['G'][self.schet].value:
+
+                # Добавьте здесь логику для поиска вашего комментария
+                # leave_reply(29622494, -144958594, 29886327, 'маори')
+                coment_id = comment['id']
+                Vk_prosto_anagram.write_to_excel(self,coment_id)
+                print('записал')
 
 
