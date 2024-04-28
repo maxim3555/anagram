@@ -112,8 +112,8 @@ class Vk_prosto_anagram:
         url = 'https://api.vk.com/method/wall.getComments'
         params = {
             'access_token': self.access_token,
-            'owner_id':-144958594,
-            'post_id':29622494 ,
+            'owner_id':self.group_id,
+            'post_id':self.post_id,
             'count': 1000,
             'extended': 1,
             'v': '5.131'  # Добавляем параметр версии API

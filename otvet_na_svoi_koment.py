@@ -7,7 +7,7 @@ import requests
 
 class Vk_prosto_otvet_na_svoi_koment:
 
-    def __init__(self,group_id, post_id,group_full, access_token,schet):
+    def __init__(self, post_id,group_id,group_full, access_token,schet):
         self.group_id=group_id
         self.post_id=post_id
         self.group_full=group_full
@@ -19,7 +19,7 @@ class Vk_prosto_otvet_na_svoi_koment:
     def leave_reply(self,parent_comment_id,text):#функция отправляет комент на свой коментарий
         url = 'https://api.vk.com/method/wall.createComment'
         params = {
-            'owner_id': self.group_id,
+            'owner_id': -self.group_id,
             'post_id': self.post_id,
             'reply_to_comment': parent_comment_id,  # ID родительского комментария
             'message': text,
